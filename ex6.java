@@ -1,140 +1,153 @@
 import java.io.*;
 import java.util.*;
-
-public class StudentRecordManagement {
-
-    static final String FILE_NAME = "students.txt";
-
-    public static void main(String[] args) throws IOException {
-        Scanner sc = new Scanner(System.in);
-        int choice;
-        do {
-            System.out.println("\n--- STUDENT RECORD MANAGEMENT SYSTEM ---");
-            System.out.println("1. Create / Overwrite Records");
-            System.out.println("2. Display All Records");
-            System.out.println("3. Append New Record");
-            System.out.println("4. Update Record");
-            System.out.println("5. Exit");
-            System.out.print("Enter your choice: ");
-            choice = sc.nextInt();
-            sc.nextLine(); // consume newline
-
-            switch (choice) {
-                case 1 -> createRecords(sc);
-                case 2 -> displayRecords();
-                case 3 -> appendRecord(sc);
-                case 4 -> updateRecord(sc);
-                case 5 -> System.out.println("Exiting...");
-                default -> System.out.println("Invalid choice!");
+public class a6 {
+    static final String FILE_NAME = "std.txt";
+    public static void createFile() {
+        try {
+            File file = new File(FILE_NAME);
+            if (file.createNewFile()) {
+                System.out.println("File created.");
             }
-        } while (choice != 5);
-        sc.close();
-    }
-
-    // Create new records (overwrite existing file)
-    public static void createRecords(Scanner sc) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            System.out.print("Enter number of students: ");
-            int n = sc.nextInt();
-            sc.nextLine();
-            for (int i = 0; i < n; i++) {
-                System.out.println("Enter details for student " + (i + 1));
-                System.out.print("ID: ");
-                String id = sc.nextLine();
-                System.out.print("Name: ");
-                String name = sc.nextLine();
-                System.out.print("Department: ");
-                String dept = sc.nextLine();
-                System.out.print("Marks: ");
-                String marks = sc.nextLine();
-                bw.write(id + "," + name + "," + dept + "," + marks);
-                bw.newLine();
-            }
+        } catch (IOException e) {
+            System.out.println("Error creating file.");
         }
-        System.out.println("Records created successfully.");
     }
-
-    // Display all records
-    public static void displayRecords() throws IOException {
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            System.out.println("No records found!");
-            return;
+    public static void writeFile(String data) {
+        try (FileWriter fw = new FileWriter(FILE_NAME)) {
+            fw.write(data);
+            System.out.println("Data written.");
+        } catch (IOException e) {
+            System.out.println("Error writing to file.");
         }
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+    }
+    public static void appendFile(String data) {
+        try (FileWriter fw = new FileWriter(FILE_NAME, true)) {
+            fw.write(data);
+            System.out.println("Data appended.");
+        } catch (IOException e) {
+            System.out.println("Error appending to file.");
+        }
+    }
+    public static void readFile() {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
-            System.out.println("\n--- Student Records ---");
+            System.out.println("Student Records:");
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                System.out.printf("ID: %s | Name: %s | Dept: %s | Marks: %s\n",
-                        data[0], data[1], data[2], data[3]);
+                System.out.println(line);
             }
+        } catch (IOException e) {
+            System.out.println("Error reading file.");
         }
     }
-
-    // Append new record
-    public static void appendRecord(Scanner sc) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            System.out.println("Enter details to append:");
-            System.out.print("ID: ");
-            String id = sc.nextLine();
-            System.out.print("Name: ");
-            String name = sc.nextLine();
-            System.out.print("Department: ");
-            String dept = sc.nextLine();
-            System.out.print("Marks: ");
-            String marks = sc.nextLine();
-            bw.write(id + "," + name + "," + dept + "," + marks);
-            bw.newLine();
-        }
-        System.out.println("Record appended successfully.");
-    }
-
-    // Update an existing record
-    public static void updateRecord(Scanner sc) throws IOException {
+    public static void updateFile(String studentId, String newData) {
         File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            System.out.println("No records found!");
-            return;
-        }
-
         List<String> lines = new ArrayList<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
-            while ((line = br.readLine()) != null)
-                lines.add(line);
-        }
-
-        System.out.print("Enter ID to update: ");
-        String targetId = sc.nextLine();
-        boolean found = false;
-
-        for (int i = 0; i < lines.size(); i++) {
-            String[] data = lines.get(i).split(",");
-            if (data[0].equals(targetId)) {
-                found = true;
-                System.out.println("Enter new details:");
-                System.out.print("Name: ");
-                String name = sc.nextLine();
-                System.out.print("Department: ");
-                String dept = sc.nextLine();
-                System.out.print("Marks: ");
-                String marks = sc.nextLine();
-                lines.set(i, targetId + "," + name + "," + dept + "," + marks);
-                break;
-            }
-        }
-
-        if (found) {
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-                for (String l : lines) {
-                    bw.write(l);
-                    bw.newLine();
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith(studentId + " ")) {
+                    lines.add(newData);
+                } else {
+                    lines.add(line);
                 }
             }
-            System.out.println("Record updated successfully.");
-        } else {
-            System.out.println("Record not found!");
+        } catch (IOException e) {
+            System.out.println("Error reading file.");
+        }
+
+        try (FileWriter fw = new FileWriter(file)) {
+            for (String l : lines) {
+                fw.write(l + "\n");
+            }
+            System.out.println("Record updated.");
+        } catch (IOException e) {
+            System.out.println("Error updating file.");
+        }
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        createFile();
+        while (true) {
+            System.out.println("\n1. Write Records");
+            System.out.println("2. Append Record");
+            System.out.println("3. Read Records");
+            System.out.println("4. Update Record");
+            System.out.println("5. Exit");
+            System.out.println("6. Overwrite Records (Delete all and add new)");
+            System.out.print("Choose: ");
+            int choice = Integer.parseInt(sc.nextLine());
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter number of students: ");
+                    int n = Integer.parseInt(sc.nextLine());
+                    StringBuilder sb = new StringBuilder();
+
+                    for (int i = 0; i < n; i++) {
+                    	System.out.println("Enter the Details of Student "+(i+1));
+                        System.out.print("ID: ");
+                        String id = sc.nextLine();
+                        System.out.print("Name: ");
+                        String name = sc.nextLine();
+                        System.out.print("Age: ");
+                        String age = sc.nextLine();
+
+                        sb.append(id).append(" ").append(name).append(" ").append(age).append("\n");
+                    }
+                    writeFile(sb.toString());
+                    break;
+
+                case 2:
+                    System.out.print("ID: ");
+                    String id = sc.nextLine();
+                    System.out.print("Name: ");
+                    String name = sc.nextLine();
+                    System.out.print("Age: ");
+                    String age = sc.nextLine();
+                    appendFile(id + " " + name + " " + age + "\n");
+                    break;
+
+                case 3:
+                    readFile();
+                    break;
+
+                case 4:
+                    System.out.print("Enter ID to update: ");
+                    String updatedId = sc.nextLine();
+                    System.out.print("New Name: ");
+                    String newName = sc.nextLine();
+                    System.out.print("New Age: ");
+                    String newAge = sc.nextLine();
+                    updateFile(updatedId, updatedId + " " + newName + " " + newAge);
+                    break;
+
+                case 5:
+                    System.out.println("Bye!");
+                    sc.close();
+                    return;
+
+                case 6:
+                    System.out.print("Enter number of new students to add: ");
+                    int count = Integer.parseInt(sc.nextLine());
+                    StringBuilder sbOverwrite = new StringBuilder();
+
+                    for (int i = 0; i < count; i++) {
+                        System.out.print("ID: ");
+                        String newId = sc.nextLine();
+                        System.out.print("Name: ");
+                        String newNameEntry = sc.nextLine();
+                        System.out.print("Age: ");
+                        String newAgeEntry = sc.nextLine();
+
+                        sbOverwrite.append(newId).append(" ").append(newNameEntry).append(" ").append(newAgeEntry).append("\n");
+                    }
+                    writeFile(sbOverwrite.toString());
+                    break;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
         }
     }
 }
+
