@@ -1,66 +1,41 @@
 class OddThread extends Thread {
-    private int n;
-
-    public OddThread(int n) {
+    int n;
+    OddThread(int n) {
         this.n = n;
     }
-
-    @Override
     public void run() {
-        System.out.println("Odd numbers:");
+        System.out.println("Odd Numbers:");
         for (int i = 1; i <= n; i++) {
             if (i % 2 != 0) {
                 System.out.println(i);
-                try {
-                    Thread.sleep(100); // simulate delay
-                } catch (InterruptedException e) {
-                    System.out.println(e);
-                }
             }
         }
     }
 }
 
 class EvenThread extends Thread {
-    private int n;
-
-    public EvenThread(int n) {
+    int n;
+    EvenThread(int n) {
         this.n = n;
     }
-
-    @Override
     public void run() {
-        System.out.println("Even numbers:");
+        System.out.println("Even Numbers:");
         for (int i = 1; i <= n; i++) {
             if (i % 2 == 0) {
                 System.out.println(i);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    System.out.println(e);
-                }
             }
         }
     }
 }
 
-public class OddEvenThreads {
+public class a7 {
     public static void main(String[] args) {
-        int range = 20; // You can change the range as needed
+        int n = 20; 
 
-        OddThread odd = new OddThread(range);
-        EvenThread even = new EvenThread(range);
+        OddThread t1 = new OddThread(n);
+        EvenThread t2 = new EvenThread(n);
 
-        odd.start();
-        even.start();
-
-        try {
-            odd.join();
-            even.join();
-        } catch (InterruptedException e) {
-            System.out.println(e);
-        }
-
-        System.out.println("Both threads have completed execution.");
+        t1.start();
+        t2.start();
     }
 }
